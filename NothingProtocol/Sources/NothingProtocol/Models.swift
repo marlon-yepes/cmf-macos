@@ -22,3 +22,23 @@ public struct BatteryStatus: Equatable {
         self.caseCharging = caseCharging
     }
 }
+
+/// Ear-tip fit-test result per side (raw seal-quality bytes, as reported).
+public struct EarTipResult: Equatable {
+    public let left: UInt8
+    public let right: UInt8
+    public init(left: UInt8, right: UInt8) {
+        self.left = left
+        self.right = right
+    }
+}
+
+/// Enhanced-bass state: whether it is enabled and its level (0–7).
+public struct EnhancedBass: Equatable {
+    public let enabled: Bool
+    public let level: Int
+    public init(enabled: Bool, level: Int) {
+        self.enabled = enabled
+        self.level = level
+    }
+}

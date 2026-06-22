@@ -9,6 +9,7 @@ public func runChecks() -> [CheckResult] {
     results.append(contentsOf: encoderChecks())
     results.append(contentsOf: decoderChecks())
     results.append(contentsOf: payloadDecoderChecks())
+    results.append(contentsOf: extendedDecoderChecks())
     return results
 }
 
@@ -128,6 +129,64 @@ private func payloadDecoderChecks() -> [CheckResult] {
                               PayloadDecoder.inEarEnabled([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00]) == false))
     checks.append(CheckResult("inEar: short frame → false",
                               PayloadDecoder.inEarEnabled([0x55, 0x60, 0x01]) == false))
+
+    return checks
+}
+
+// MARK: - Typed payload decoders (ANC / EQ / firmware / serial / ear-tip / etc.)
+
+private func extendedDecoderChecks() -> [CheckResult] {
+    var checks: [CheckResult] = []
+
+    // ANC: status byte at [9].
+    checks.append(CheckResult("anc: [9]=0x07 → transparency",
+                              PayloadDecoder.ancMode([0, 0, 0, 0, 0, 0, 0, 0, 0, 0x07]) == .transparency))
+    checks.append(CheckResult("anc: [9]=0x05 → off",
+                              PayloadDecoder.ancMode([0, 0, 0, 0, 0, 0, 0, 0, 0, 0x05]) == .off))
+    checks.append(CheckResult("anc: [9]=0x09 unknown → nil",
+                              PayloadDecoder.ancMode([0, 0, 0, 0, 0, 0, 0, 0, 0, 0x09]) == nil))
+
+    // EQ: mode at [8].
+    checks.append(CheckResult("eq: [8]=3 → moreBass",
+                              PayloadDecoder.eqProfile([0, 0, 0, 0, 0, 0, 0, 0, 3]) == .moreBass))
+    checks.append(CheckResult("eq: [8]=99 unknown → balanced",
+                              PayloadDecoder.eqProfile([0, 0, 0, 0, 0, 0, 0, 0, 99]) == .balanced))
+
+    // Firmware: [5]=size=3, characters "1.2" at [8..10].
+    let fw: [UInt8] = [0, 0, 0, 0, 0, 3, 0, 0, 0x31, 0x2E, 0x32]
+    checks.append(CheckResult("firmware: size=3 → \"1.2\"",
+                              PayloadDecoder.firmware(fw) == "1.2",
+                              "got \"\(PayloadDecoder.firmware(fw))\""))
+
+    // Serial: UTF-8 lines from [7]; first type==4 value.
+    let serialFrame: [UInt8] = [0, 0, 0, 0, 0, 0, 0] + Array("1,4,ABCDEFG".utf8)
+    checks.append(CheckResult("serial: type 4 value → ABCDEFG",
+                              PayloadDecoder.serial(serialFrame) == "ABCDEFG",
+                              "got \"\(PayloadDecoder.serial(serialFrame))\""))
+    checks.append(CheckResult("serial: short frame → default",
+                              PayloadDecoder.serial([0x55, 0x60]) == PayloadDecoder.defaultSerial))
+
+    // Ear-tip: [8]=left, [9]=right.
+    checks.append(CheckResult("earTip: left=2 right=1",
+                              PayloadDecoder.earTipResult([0, 0, 0, 0, 0, 0, 0, 0, 2, 1]) == EarTipResult(left: 2, right: 1)))
+
+    // Advanced EQ: [8]==1.
+    checks.append(CheckResult("advancedEQ: [8]=1 → true",
+                              PayloadDecoder.advancedEQEnabled([0, 0, 0, 0, 0, 0, 0, 0, 1]) == true))
+
+    // Enhanced bass: enabled [8], level [9]/2.
+    checks.append(CheckResult("enhancedBass: enabled=true level=3",
+                              PayloadDecoder.enhancedBass([0, 0, 0, 0, 0, 0, 0, 0, 1, 6]) == EnhancedBass(enabled: true, level: 3)))
+
+    // Personalized ANC: [8]==1.
+    checks.append(CheckResult("personalizedANC: [8]=1 → true",
+                              PayloadDecoder.personalizedANCEnabled([0, 0, 0, 0, 0, 0, 0, 0, 1]) == true))
+
+    // Case LED: count at [8]; RGB at 10 + i*4.
+    let led: [UInt8] = [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0xAA, 0xBB, 0xCC]
+    checks.append(CheckResult("caseLED: 1 LED → [[0xAA,0xBB,0xCC]]",
+                              PayloadDecoder.caseLEDColors(led) == [[0xAA, 0xBB, 0xCC]],
+                              "got \(PayloadDecoder.caseLEDColors(led).map(hex))"))
 
     return checks
 }
