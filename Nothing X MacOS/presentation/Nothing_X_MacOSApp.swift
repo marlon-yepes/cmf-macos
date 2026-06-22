@@ -37,28 +37,7 @@ struct Nothing_X_MacOSApp: App {
                 
                 HomeView()
                     .navigationDestination(for: Destination.self) { destination in
-                        switch(destination) {
-                        case .home: HomeView()
-                                .transition(.asymmetric(insertion: .opacity, removal: .opacity))
-                        case .equalizer: EqualizerView(eqMode: $viewModel.eqProfiles)
-                        case .controls: ControlsView()
-                        case .controlsTripleTap: controlsDetailView(.controlsTripleTap)
-                        case .controlsTapHold: controlsDetailView(.controlsTapHold)
-                        case .controlsDoubleTap: controlsDetailView(.controlsDoubleTap)
-                        case .controlsDoubleTapHold: controlsDetailView(.controlsDoubleTapHold)
-                        case .settings: SettingsView()
-                        case .findMyBuds: FindMyBudsView()
-                        case .discover: DiscoverView()
-                                .transition(.asymmetric(insertion: .opacity, removal: .opacity))
-                        case .connect: ConnectView()
-                            //                                .animation(nil)
-                                .transition(.asymmetric(insertion: .opacity, removal: .opacity))
-                        case .discover_started: DiscoverStartedView()
-                        case .bluetooth_off: BluetoothIsOffView()
-                        case .earTipTest: EarTipTestView()
-                        case .caseLED: CaseLEDView()
-
-                        }
+                        DestinationView(destination: destination)
                         
                         
                     }
@@ -88,18 +67,4 @@ struct Nothing_X_MacOSApp: App {
 
     }
 
-    @ViewBuilder
-    private func controlsDetailView(_ destination: Destination) -> some View {
-        ControlsDetailView(
-            destination: destination,
-            leftTripleTapAction: $viewModel.leftTripleTapAction,
-            rightTripleTapAction: $viewModel.rightTripleTapAction,
-            leftTapAndHoldAction: $viewModel.leftTapAndHoldAction,
-            rightTapAndHoldAction: $viewModel.rightTapAndHoldAction,
-            leftDoubleTapAction: $viewModel.leftDoubleTapAction,
-            rightDoubleTapAction: $viewModel.rightDoubleTapAction,
-            leftDoubleTapAndHoldAction: $viewModel.leftDoubleTapAndHoldAction,
-            rightDoubleTapAndHoldAction: $viewModel.rightDoubleTapAndHoldAction
-        )
-    }
 }
