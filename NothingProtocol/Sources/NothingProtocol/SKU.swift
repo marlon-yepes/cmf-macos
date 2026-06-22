@@ -1,0 +1,88 @@
+/// Exact product variant (color / batch), ported verbatim from the app's
+/// `domain/enums/device/SKU.swift`. Raw values are the 2-digit codes embedded in
+/// the serial number (or the longer code for FLAFFY).
+public enum SKU: String, Codable {
+
+    case UNKNOWN = "--"
+    case EAR_1_WHITE = "01"
+    case EAR_1_BLACK = "02"
+    case EAR_1_WHITE_DUPLICATE = "03"
+    case EAR_1_BLACK_DUPLICATE = "04"
+    case EAR_1_BLACK_ALTERNATE = "06"
+    case EAR_1_WHITE_ALTERNATE = "07"
+    case EAR_1_BLACK_ANOTHER = "08"
+    case EAR_1_BLACK_FINAL = "10"
+    case EAR_STICK_1 = "14"
+    case EAR_STICK_2 = "15"
+    case EAR_STICK_3 = "16"
+    case EAR_2_WHITE_1 = "17"
+    case EAR_2_WHITE_2 = "18"
+    case EAR_2_WHITE_3 = "19"
+    case EAR_2_BLACK_1 = "27"
+    case EAR_2_BLACK_2 = "28"
+    case EAR_2_BLACK_3 = "29"
+    case CORSOLA_BLACK_1 = "30"
+    case CORSOLA_BLACK_2 = "31"
+    case CORSOLA_WHITE_1 = "32"
+    case CORSOLA_WHITE_2 = "33"
+    case CORSOLA_ORANGE_1 = "34"
+    case CORSOLA_ORANGE_2 = "35"
+    case CROBAT_ORANGE = "48"
+    case CROBAT_WHITE = "49"
+    case CROBAT_BLACK_1 = "50"
+    case CROBAT_BLACK_2 = "51"
+    case CROBAT_WHITE_2 = "52"
+    case CROBAT_ORANGE_2 = "53"
+    case DONPHAN_BLACK_1 = "54"
+    case DONPHAN_BLACK_2 = "55"
+    case DONPHAN_WHITE_1 = "56"
+    case DONPHAN_WHITE_2 = "57"
+    case DONPHAN_ORANGE_1 = "58"
+    case DONPHAN_ORANGE_2 = "59"
+    case ENTEI_BLACK_1 = "61"
+    case ENTEI_WHITE_1 = "62"
+    case CLEFFA_BLACK_1 = "63"
+    case CLEFFA_WHITE_1 = "64"
+    case CLEFFA_YELLOW_1 = "65"
+    case CLEFFA_BLACK_2 = "66"
+    case CLEFFA_WHITE_2 = "67"
+    case CLEFFA_YELLOW_2 = "68"
+    case ENTEI_BLACK_2 = "69"
+    case ENTEI_WHITE_2 = "70"
+    case CLEFFA_BLACK_3 = "71"
+    case CLEFFA_WHITE_3 = "72"
+    case CLEFFA_YELLOW_3 = "73"
+    case ENTEI_BLACK_3 = "74"
+    case ENTEI_WHITE_3 = "75"
+    case ESPEON_BLACK_1 = "76"
+    case ESPEON_WHITE_1 = "77"
+    case ESPEON_ORANGE_1 = "78"
+    case ESPEON_BLUE_1 = "79"
+    case ESPEON_BLUE_2 = "80"
+    case ESPEON_ORANGE_2 = "81"
+    case ESPEON_WHITE_2 = "82"
+    case ESPEON_BLACK_3 = "83"
+    case FLAFFY_WHITE = "11200005"
+
+    // Ear (3) / Threes
+    case EAR3_1 = "25"
+    case EAR3_2 = "26"
+
+    // CMF Buds 2 / Girafarig
+    case GIRAFARIG_BLACK = "84"
+    case GIRAFARIG_GREEN = "85"
+    case GIRAFARIG_ORANGE = "86"
+
+    // CMF Buds 2 Plus / Gligar
+    case GLIGAR_WHITE = "87"
+    case GLIGAR_BLUE = "88"
+
+    // CMF Buds 2a / Hoothoot
+    case HOOTHOOT_BLACK = "89"
+    case HOOTHOOT_WHITE = "90"
+    case HOOTHOOT_ORANGE = "91"
+
+    // Nothing Headphone (1) / Elekid
+    case ELEKID_BLACK = "92"
+    case ELEKID_GREY = "93"
+}

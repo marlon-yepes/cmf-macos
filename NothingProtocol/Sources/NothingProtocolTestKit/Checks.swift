@@ -10,7 +10,52 @@ public func runChecks() -> [CheckResult] {
     results.append(contentsOf: decoderChecks())
     results.append(contentsOf: payloadDecoderChecks())
     results.append(contentsOf: extendedDecoderChecks())
+    results.append(contentsOf: deviceChecks())
     return results
+}
+
+// MARK: - Device identification & capabilities
+
+private func deviceChecks() -> [CheckResult] {
+    var checks: [CheckResult] = []
+
+    // Serial → SKU → codename (CMF Buds 2 black: serial code "84").
+    let sku = skuFromSerial(serial: "SH0084000000")
+    checks.append(CheckResult("skuFromSerial(SH..84..) == GIRAFARIG_BLACK",
+                              sku == .GIRAFARIG_BLACK, "got \(sku.rawValue)"))
+    checks.append(CheckResult("codenameFromSKU(GIRAFARIG_BLACK) == GIRAFARIG",
+                              codenameFromSKU(sku: .GIRAFARIG_BLACK) == .GIRAFARIG))
+    checks.append(CheckResult("skuFromSerial(placeholder) == EAR_1_WHITE",
+                              skuFromSerial(serial: "12345678901234567") == .EAR_1_WHITE))
+    checks.append(CheckResult("skuFromSerial(empty) == UNKNOWN",
+                              skuFromSerial(serial: "") == .UNKNOWN))
+
+    // Bluetooth name → codename.
+    checks.append(CheckResult("name 'Nothing Ear (2)' → TWO",
+                              codenameFromDeviceName(name: "Nothing Ear (2)") == .TWO))
+    checks.append(CheckResult("name 'CMF Buds 2 Plus' → GLIGAR",
+                              codenameFromDeviceName(name: "CMF Buds 2 Plus") == .GLIGAR))
+    checks.append(CheckResult("name 'CMF Buds 2' → GIRAFARIG",
+                              codenameFromDeviceName(name: "CMF Buds 2") == .GIRAFARIG))
+    checks.append(CheckResult("name 'Nothing Ear (3)' → EAR3",
+                              codenameFromDeviceName(name: "Nothing Ear (3)") == .EAR3))
+
+    // Documents a known gap: "CMF Buds Pro 2" is NOT recognized (→ UNKNOWN).
+    // The name matcher and SKU table have no entry for it.
+    checks.append(CheckResult("GAP: name 'CMF Buds Pro 2' → UNKNOWN (unsupported)",
+                              codenameFromDeviceName(name: "CMF Buds Pro 2") == .UNKNOWN,
+                              "got \(codenameFromDeviceName(name: "CMF Buds Pro 2").rawValue)"))
+
+    // Capabilities table.
+    let ear3 = DeviceCapabilities.capabilities(for: .EAR3)
+    checks.append(CheckResult("caps(EAR3): customEQ && earTipTest",
+                              ear3.supportsCustomEQ && ear3.supportsEarTipTest))
+    checks.append(CheckResult("caps(GIRAFARIG): enhancedBass",
+                              DeviceCapabilities.capabilities(for: .GIRAFARIG).supportsEnhancedBass))
+    checks.append(CheckResult("caps(UNKNOWN) == none (all false)",
+                              DeviceCapabilities.capabilities(for: .UNKNOWN) == .none))
+
+    return checks
 }
 
 /// Hex dump helper for failure detail messages.
