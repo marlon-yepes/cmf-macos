@@ -6,7 +6,13 @@ public func runChecks() -> [CheckResult] {
     var results: [CheckResult] = []
     results.append(contentsOf: crcChecks())
     results.append(contentsOf: commandChecks())
+    results.append(contentsOf: encoderChecks())
     return results
+}
+
+/// Hex dump helper for failure detail messages.
+func hex(_ bytes: [UInt8]) -> String {
+    "[" + bytes.map { String(format: "0x%02X", $0) }.joined(separator: ", ") + "]"
 }
 
 // MARK: - Command & constants
@@ -25,6 +31,26 @@ private func commandChecks() -> [CheckResult] {
         CheckResult("ProtocolConstants.magic == 0x55",
                     ProtocolConstants.magic == 0x55,
                     "got 0x\(String(ProtocolConstants.magic, radix: 16))"),
+    ]
+}
+
+// MARK: - Encoder
+// Golden frames computed by an independent CRC-16/MODBUS implementation.
+
+private func encoderChecks() -> [CheckResult] {
+    let getBattery = PacketEncoder.encode(command: .GET_BATTERY)
+    let expectedGetBattery: [UInt8] = [0x55, 0x60, 0x01, 0x07, 0xC0, 0x00, 0x00, 0x07, 0x2C, 0xDD]
+
+    let setLatency = PacketEncoder.encode(command: .SET_LATENCY, payload: [0x01])
+    let expectedSetLatency: [UInt8] = [0x55, 0x60, 0x01, 0x40, 0xF0, 0x01, 0x00, 0x40, 0x01, 0x60, 0x62]
+
+    return [
+        CheckResult("encode(GET_BATTERY) == golden frame",
+                    getBattery == expectedGetBattery,
+                    "got \(hex(getBattery))"),
+        CheckResult("encode(SET_LATENCY, [0x01]) == golden frame",
+                    setLatency == expectedSetLatency,
+                    "got \(hex(setLatency))"),
     ]
 }
 
