@@ -83,11 +83,15 @@ private func deviceChecks() -> [CheckResult] {
     checks.append(CheckResult("name 'Nothing Ear (3)' → EAR3",
                               codenameFromDeviceName(name: "Nothing Ear (3)") == .EAR3))
 
-    // Documents a known gap: "CMF Buds Pro 2" is NOT recognized (→ UNKNOWN).
-    // The name matcher and SKU table have no entry for it.
-    checks.append(CheckResult("GAP: name 'CMF Buds Pro 2' → UNKNOWN (unsupported)",
-                              codenameFromDeviceName(name: "CMF Buds Pro 2") == .UNKNOWN,
+    // CMF Buds Pro 2: now recognized by name (provisional → ESPEON / B172).
+    checks.append(CheckResult("name 'CMF Buds Pro 2' → ESPEON (provisional)",
+                              codenameFromDeviceName(name: "CMF Buds Pro 2") == .ESPEON,
                               "got \(codenameFromDeviceName(name: "CMF Buds Pro 2").rawValue)"))
+    checks.append(CheckResult("name 'cmf buds pro 2' (case-insensitive) → ESPEON",
+                              codenameFromDeviceName(name: "cmf buds pro 2") == .ESPEON))
+    // Regression guard: 'CMF Buds 2' must NOT be captured by the Pro 2 branch.
+    checks.append(CheckResult("name 'CMF Buds 2' still → GIRAFARIG (not Pro 2)",
+                              codenameFromDeviceName(name: "CMF Buds 2") == .GIRAFARIG))
 
     // Capabilities table.
     let ear3 = DeviceCapabilities.capabilities(for: .EAR3)

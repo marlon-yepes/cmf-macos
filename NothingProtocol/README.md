@@ -38,13 +38,18 @@ Both runners consume the same single source of test cases,
 Decoders and identification mirror the app's logic exactly (extraction, not
 redesign); the only added behavior is bounds-safety.
 
-### Known device gap
+### CMF Buds Pro 2 (provisional)
 
-`CMF Buds Pro 2` is **not** recognized — it has no entry in the name matcher or the
-SKU table, so it resolves to `Codenames.UNKNOWN` (all capabilities off). Supported
-CMF models are Buds 2 (`GIRAFARIG`), Buds 2 Plus (`GLIGAR`), Buds 2a (`HOOTHOOT`).
-Adding Buds Pro 2 needs its codename + SKU codes + capability profile (to be
-reverse-engineered). A test documents this gap.
+`CMF Buds Pro 2` is recognized by Bluetooth name and mapped **provisionally** to
+`ESPEON` (`B172`). Rationale: its internal model has been reported as B172, and
+Gadgetbridge drives it with the Nothing Ear 2 profile (same RFCOMM protocol), so the
+existing encoders/decoders apply; `ESPEON` already carries a rich capability profile.
+
+**This mapping is unverified** (done without a physical unit). To confirm/correct it:
+connect the buds and check the codename/serial the app logs (`NXLogger`,
+`.bluetooth`/`.persistence`). If the serial yields a different SKU, or the logged
+codename differs, update `codenameFromDeviceName` (and add the serial's SKU code to
+`SKU` / `codenameFromSKU`). A test pins the current mapping.
 
 Custom EQ float decoding (`eqFloat` / `customEQ`) and gesture parsing
 (`gestures`, with `DeviceType` / `GestureType`) are included.
