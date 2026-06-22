@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D9A1C0DE0000000000000001 /* NothingProtocol in Frameworks */ = {isa = PBXBuildFile; productRef = D9A1C0DE0000000000000002 /* NothingProtocol */; };
 		65715E482D76E5FE001F3E36 /* exportOptions.plist in Resources */ = {isa = PBXBuildFile; fileRef = 65715E472D76E5FE001F3E36 /* exportOptions.plist */; };
 		65715F472D799E53001F3E36 /* radio_button_not_selected_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 65715F452D799E53001F3E36 /* radio_button_not_selected_dark.png */; };
 		65715F482D799E53001F3E36 /* radio_button_selected_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 65715F462D799E53001F3E36 /* radio_button_selected_dark.png */; };
@@ -17,7 +18,6 @@
 		D60A9B092992693300749EB6 /* 5by7.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D60A9B082992693300749EB6 /* 5by7.ttf */; };
 		D60A9B0A2992693300749EB6 /* 5by7.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D60A9B082992693300749EB6 /* 5by7.ttf */; };
 		D60A9B0B2992693300749EB6 /* 5by7.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D60A9B082992693300749EB6 /* 5by7.ttf */; };
-		D60C145E29697E7B003E10D4 /* Nothing_X_MacOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D60C145D29697E7B003E10D4 /* Nothing_X_MacOSApp.swift */; };
 		D60C146229697E7C003E10D4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D60C146129697E7C003E10D4 /* Assets.xcassets */; };
 		D60C146529697E7C003E10D4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D60C146429697E7C003E10D4 /* Preview Assets.xcassets */; };
 		D60C147029697E7C003E10D4 /* Nothing_X_MacOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D60C146F29697E7C003E10D4 /* Nothing_X_MacOSTests.swift */; };
@@ -55,7 +55,6 @@
 		658FEF072D7EFAC800699B1A /* bluetooth_disabled.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = bluetooth_disabled.svg; sourceTree = "<group>"; };
 		D60A9B082992693300749EB6 /* 5by7.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = 5by7.ttf; sourceTree = "<group>"; };
 		D60C145A29697E7B003E10D4 /* Nothing X MacOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Nothing X MacOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		D60C145D29697E7B003E10D4 /* Nothing_X_MacOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Nothing_X_MacOSApp.swift; sourceTree = "<group>"; };
 		D60C146129697E7C003E10D4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D60C146429697E7C003E10D4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		D60C146629697E7C003E10D4 /* Nothing_X_MacOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Nothing_X_MacOS.entitlements; sourceTree = "<group>"; };
@@ -84,6 +83,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D9A1C0DE0000000000000001 /* NothingProtocol in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -149,7 +149,6 @@
 				657C065B2D6458BF003B83D2 /* domain */,
 				657C06682D6458BF003B83D2 /* framework */,
 				657C06692D6458BF003B83D2 /* presentation */,
-				D60C145D29697E7B003E10D4 /* Nothing_X_MacOSApp.swift */,
 				D60A9B02299265D000749EB6 /* resources */,
 				D60C148829699B4D003E10D4 /* Nothing-X-MacOS-Info.plist */,
 				D60C146129697E7C003E10D4 /* Assets.xcassets */,
@@ -215,6 +214,9 @@
 			);
 			dependencies = (
 			);
+			packageProductDependencies = (
+				D9A1C0DE0000000000000002 /* NothingProtocol */,
+			);
 			fileSystemSynchronizedGroups = (
 				657C06512D6458BF003B83D2 /* data */,
 				657C065B2D6458BF003B83D2 /* domain */,
@@ -270,7 +272,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1420;
-				LastUpgradeCheck = 1420;
+				LastUpgradeCheck = 2650;
 				TargetAttributes = {
 					D60C145929697E7B003E10D4 = {
 						CreatedOnToolsVersion = 14.2;
@@ -294,6 +296,9 @@
 				Base,
 			);
 			mainGroup = D60C145129697E7B003E10D4;
+			packageReferences = (
+				D9A1C0DE0000000000000003 /* XCLocalSwiftPackageReference "NothingProtocol" */,
+			);
 			productRefGroup = D60C145B29697E7B003E10D4 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -304,6 +309,20 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		D9A1C0DE0000000000000003 /* XCLocalSwiftPackageReference "NothingProtocol" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = NothingProtocol;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D9A1C0DE0000000000000002 /* NothingProtocol */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NothingProtocol;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin PBXResourcesBuildPhase section */
 		D60C145829697E7B003E10D4 /* Resources */ = {
@@ -351,7 +370,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D60C145E29697E7B003E10D4 /* Nothing_X_MacOSApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -421,9 +439,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -443,6 +463,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -481,9 +502,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -496,6 +519,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
@@ -511,6 +535,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 2;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Nothing X MacOS/Preview Content\"";
 				DEVELOPMENT_TEAM = V3KGFK26LD;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -544,6 +569,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 2;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Nothing X MacOS/Preview Content\"";
 				DEVELOPMENT_TEAM = V3KGFK26LD;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -570,10 +596,10 @@
 		D60C148329697E7D003E10D4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = ZDQ9CMTR26;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
@@ -589,10 +615,10 @@
 		D60C148429697E7D003E10D4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = ZDQ9CMTR26;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
@@ -608,9 +634,9 @@
 		D60C148629697E7D003E10D4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = ZDQ9CMTR26;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 2.0.0;
@@ -625,9 +651,9 @@
 		D60C148729697E7D003E10D4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = ZDQ9CMTR26;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 2.0.0;

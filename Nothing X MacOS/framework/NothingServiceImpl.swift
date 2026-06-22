@@ -6,6 +6,7 @@
 //
 import Combine
 import Foundation
+import NothingProtocol
 
 
 // Define a custom error type
@@ -68,7 +69,7 @@ class NothingServiceImpl : NothingService {
 
                     // Fallback: detect codename from device name if still unknown
                     if self.nothingDevice?.codename == .UNKNOWN {
-                        let detected = codenameFromDeviceName(name: device.name)
+                        let detected = Nothing_X_MacOS.codenameFromDeviceName(name: device.name)
                         if detected != .UNKNOWN {
                             self.nothingDevice?.codename = detected
                             self.log.info("Codename detected from device name: \(detected)")
@@ -563,34 +564,19 @@ class NothingServiceImpl : NothingService {
     #warning("low latency mode switch is not implemented")
     
     private func send(command: UInt16, operationID: UInt8, payload: [UInt8] = []) {
-        var header: [UInt8] = [0x55, 0x60, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00]
-        
-        header[7] = UInt8(operationID)
+        // Delegate frame construction to the tested NothingProtocol codec.
+        guard let cmd = NothingProtocol.Command(rawValue: command) else {
+            log.error("Unknown command 0x\(String(command, radix: 16)); not sending")
+            return
+        }
         log.debug("Operation ID: \(operationID)")
-        
-        // Convert command to bytes
-        let commandBytes = withUnsafeBytes(of: command.bigEndian) { Array($0) }
-        header[3] = commandBytes[0]
-        header[4] = commandBytes[1]
-        
-        let payloadLength = UInt8(clamping: payload.count)
-        header[5] = payloadLength
-        
-        // Append payload to header
-        header.append(contentsOf: payload)
-        
-        // Calculate CRC
-        let crc = CRC16.crc16(buffer: header)
-        header.append(UInt8(crc & 0xFF)) // Append low byte
-        header.append(UInt8((crc >> 8) & 0xFF))
-        
-        let hexString = header.map { String(format: "%02x", $0) }.joined()
+
+        var frame = PacketEncoder.encode(command: cmd, operationID: operationID, payload: payload)
+
+        let hexString = frame.map { String(format: "%02x", $0) }.joined()
         log.debug("Sending: \(hexString)")
-        
-        // Send the data
-     
-        bluetoothManager.send(data: &header, length: UInt16(header.count))
-   
+
+        bluetoothManager.send(data: &frame, length: UInt16(frame.count))
     }
 
     
@@ -686,47 +672,25 @@ class NothingServiceImpl : NothingService {
     }
 
     private func readBattery(hexString: [UInt8]) {
+        let status = PayloadDecoder.battery(hexString)
 
-        let BATTERY_MASK: UInt8 = 127
-        let RECHARGING_MASK: UInt8 = 128
+        nothingDevice?.isLeftConnected = status.left != nil
+        nothingDevice?.isRightConnected = status.right != nil
+        nothingDevice?.isCaseConnected = status.caseLevel != nil
 
-        // Read the number of connected devices
-        guard hexString.count > 8 else { return }
-        let connectedDevices = Int(hexString[8])
-        
-        nothingDevice?.isCaseConnected = false
-        nothingDevice?.isLeftConnected = false
-        nothingDevice?.isRightConnected = false
-        
-        // Process each connected device
-        for i in 0..<connectedDevices {
-            let deviceIdIndex = 9 + (i * 2)
-            let batteryDataIndex = 10 + (i * 2)
-            guard batteryDataIndex < hexString.count else { break }
-            let deviceId = hexString[deviceIdIndex]
-            let batteryData = hexString[batteryDataIndex]
-            let batteryLevel = Int(batteryData & BATTERY_MASK)
-            let isCharging = (batteryData & RECHARGING_MASK) == RECHARGING_MASK
-            
-            switch deviceId {
-            case 0x02: // Left device
-                nothingDevice?.leftBattery = batteryLevel
-                nothingDevice?.isLeftCharging = isCharging
-                nothingDevice?.isLeftConnected = true
-            case 0x03: // Right device
-                nothingDevice?.rightBattery = batteryLevel
-                nothingDevice?.isRightCharging = isCharging
-                nothingDevice?.isRightConnected = true
-            case 0x04: // Case device
-                nothingDevice?.caseBattery = batteryLevel
-                nothingDevice?.isCaseCharging = isCharging
-                nothingDevice?.isCaseConnected = true
-            default:
-                // Handle unknown device ID if necessary
-                break
-            }
+        if let left = status.left {
+            nothingDevice?.leftBattery = left
+            nothingDevice?.isLeftCharging = status.leftCharging
         }
-        
+        if let right = status.right {
+            nothingDevice?.rightBattery = right
+            nothingDevice?.isRightCharging = status.rightCharging
+        }
+        if let caseLevel = status.caseLevel {
+            nothingDevice?.caseBattery = caseLevel
+            nothingDevice?.isCaseCharging = status.caseCharging
+        }
+
         log.debug("Battery L:\(nothingDevice?.leftBattery ?? -1)% R:\(nothingDevice?.rightBattery ?? -1)% C:\(nothingDevice?.caseBattery ?? -1)%")
     }
     
@@ -758,104 +722,39 @@ class NothingServiceImpl : NothingService {
     }
     
     private func readANC(hexArray: [UInt8]) {
-        guard hexArray.count > 9 else { return }
-        let ancStatus = hexArray[9]
-        let level = ANC(rawValue: ancStatus)
-        guard let unwrappedLevel = level else {
+        guard let mode = PayloadDecoder.ancMode(hexArray),
+              let unwrappedLevel = ANC(rawValue: mode.rawValue) else {
             return
         }
         nothingDevice?.anc = unwrappedLevel
-  
-        
         log.debug("ANC level: \(unwrappedLevel)")
-        
         nothingDevice?.printValues()
-        
     }
     
     private func readEQ(hexArray: [UInt8]) -> EQProfiles {
-        guard hexArray.count > 8 else { return .BALANCED }
-
-        let eqMode: UInt8 = hexArray[8]
-        log.debug("EQ mode: \(eqMode)")
-        
-        return EQProfiles(rawValue: eqMode) ?? EQProfiles.BALANCED
-        
+        return EQProfiles(rawValue: PayloadDecoder.eqProfile(hexArray).rawValue) ?? .BALANCED
     }
     
     private func readSerial(hexPayload: [UInt8]) -> String {
-        
-        
-        var configurations: [(device: Int, type: Int, value: String)] = []
-        
-        // Decode the remaining payload and split by new lines
-        let linesData = hexPayload[7...] // Subarray from index 7 to the end
-        let lines = String(decoding: linesData, as: UTF8.self).split(separator: "\n")
-        
-        // Process each line
-        for line in lines {
-            let parts = line.split(separator: ",").map { String($0) }
-            if parts.count == 3,
-               let device = Int(parts[0]),
-               let type = Int(parts[1]),
-               let value = parts[2].nonEmpty {
-                configurations.append((device: device, type: type, value: value))
-            }
-        }
-        
-        // Filter configurations to find the serial number
-        let serialConfigs = configurations.filter { $0.type == 4 && !$0.value.isEmpty }
-        
-        for config in configurations {
-            log.debug("Config: device=\(config.device) type=\(config.type) value=\(config.value)")
-        }
-        let serialValue = serialConfigs.first?.value ?? "12345678901234567"
+        let serialValue = PayloadDecoder.serial(hexPayload)
         log.info("Serial: \(serialValue)")
         return serialValue
     }
     
    
     private func readFirmware(hexArray: [UInt8]) -> String {
-        
-        // Initialize an empty string for the firmware version
-        var firmwareVersion = ""
-        
-        // Ensure that the hexArray has enough elements
-        guard hexArray.count > 8 else {
-            log.error("hexArray does not contain enough elements for firmware")
-            return firmwareVersion
-        }
-        
-        // Get the size from the hexArray
-        let size = hexArray[5]
-        
-        // Extract the firmware version based on the size
-        for i in 0..<size {
-            let index = 8 + Int(i)
-            if index < hexArray.count {
-                firmwareVersion += String(UnicodeScalar(hexArray[index]))
-            } else {
-                log.warning("Index \(index) out of bounds for firmware hexArray")
-                break
-            }
-        }
-        
+        let firmwareVersion = PayloadDecoder.firmware(hexArray)
         nothingDevice?.firmware = firmwareVersion
         log.info("Firmware: \(firmwareVersion)")
-        
         return firmwareVersion
     }
     
     private func readLatencyMode(hexArray: [UInt8]) -> Bool {
-        log.debug("Reading latency mode")
-        guard hexArray.count > 8 else { return false }
-        return hexArray[8] == 0x01
+        return PayloadDecoder.latencyEnabled(hexArray)
     }
 
     private func readInEarDetection(hexArray: [UInt8]) -> Bool {
-        log.debug("Reading in-ear detection")
-        guard hexArray.count > 10 else { return false }
-        return (hexArray[10] != 0)
+        return PayloadDecoder.inEarEnabled(hexArray)
     }
 
     // MARK: - Custom EQ Float Encoding
@@ -1054,10 +953,10 @@ class NothingServiceImpl : NothingService {
             let firmware = readFirmware(hexArray: rawData)
             nothingDevice?.firmware = firmware
             if (nothingDevice?.sku == SKU.UNKNOWN) {
-                let detectedSku = skuFromFirmware(firmware: firmware)
+                let detectedSku = Nothing_X_MacOS.skuFromFirmware(firmware: firmware)
                 if detectedSku != .UNKNOWN {
                     nothingDevice?.sku = detectedSku
-                    nothingDevice?.codename = codenameFromSKU(sku: detectedSku)
+                    nothingDevice?.codename = Nothing_X_MacOS.codenameFromSKU(sku: detectedSku)
                 }
             }
             
@@ -1066,13 +965,13 @@ class NothingServiceImpl : NothingService {
             let serial = readSerial(hexPayload: rawData)
             if (!serial.isEmpty) {
                 nothingDevice?.serial = serial
-                let sku = skuFromSerial(serial: serial)
+                let sku = Nothing_X_MacOS.skuFromSerial(serial: serial)
                 if sku != .UNKNOWN {
                     nothingDevice?.sku = sku
-                    nothingDevice?.codename = codenameFromSKU(sku: sku)
+                    nothingDevice?.codename = Nothing_X_MacOS.codenameFromSKU(sku: sku)
                 } else if nothingDevice?.codename == .UNKNOWN, let name = nothingDevice?.name {
                     // Fallback: detect from device name
-                    let detected = codenameFromDeviceName(name: name)
+                    let detected = Nothing_X_MacOS.codenameFromDeviceName(name: name)
                     if detected != .UNKNOWN {
                         nothingDevice?.codename = detected
                         log.info("Codename detected from name fallback: \(detected)")
