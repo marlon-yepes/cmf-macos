@@ -97,6 +97,12 @@ public func codenameFromDeviceName(name: String) -> Codenames {
         return .EAR3
     } else if lowered.contains("ear (open)") {
         return .FLAFFY
+    } else if lowered.contains("cmf buds pro 2") || lowered.contains("buds pro 2") {
+        // CMF Buds Pro 2 — added support (the app currently returns UNKNOWN here).
+        // PROVISIONAL mapping to ESPEON (internal model reported as B172; Gadgetbridge
+        // drives it with the Nothing Ear 2 profile, i.e. same RFCOMM protocol).
+        // Confirm against a real unit's serial/codename — see README.
+        return .ESPEON
     } else if lowered.contains("cmf buds 2 plus") || lowered.contains("buds 2 plus") {
         return .GLIGAR
     } else if lowered.contains("cmf buds 2a") || lowered.contains("buds 2a") {
