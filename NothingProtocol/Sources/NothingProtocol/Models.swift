@@ -42,3 +42,27 @@ public struct EnhancedBass: Equatable {
         self.level = level
     }
 }
+
+/// One gesture binding: a gesture on a given earbud mapped to an action code.
+public struct GestureAssignment: Equatable {
+    public let device: DeviceType
+    public let gesture: GestureType
+    public let action: UInt8
+    public init(device: DeviceType, gesture: GestureType, action: UInt8) {
+        self.device = device
+        self.gesture = gesture
+        self.action = action
+    }
+}
+
+/// Custom EQ gains (dB) for the three bands.
+public struct CustomEQ: Equatable {
+    public let bass: Float
+    public let mid: Float
+    public let treble: Float
+    public init(bass: Float, mid: Float, treble: Float) {
+        self.bass = bass
+        self.mid = mid
+        self.treble = treble
+    }
+}
