@@ -8,6 +8,7 @@ public func runChecks() -> [CheckResult] {
     results.append(contentsOf: commandChecks())
     results.append(contentsOf: encoderChecks())
     results.append(contentsOf: decoderChecks())
+    results.append(contentsOf: payloadDecoderChecks())
     return results
 }
 
@@ -89,6 +90,44 @@ private func decoderChecks() -> [CheckResult] {
     var badMagic = frame
     badMagic[0] = 0x00
     checks.append(CheckResult("decode rejects wrong magic", PacketDecoder.decode(badMagic) == nil))
+
+    return checks
+}
+
+// MARK: - Typed payload decoders (battery / latency / in-ear)
+// Frames are synthetic: these decoders read absolute offsets and do not validate
+// CRC (matching the app, which parses already-received bytes).
+
+private func payloadDecoderChecks() -> [CheckResult] {
+    var checks: [CheckResult] = []
+
+    // Battery: count=2 at [8]; left(0x02)=85 not charging (0x55); right(0x03)=72 charging (0xC8).
+    let batteryFrame: [UInt8] = [0, 0, 0, 0, 0, 0, 0, 0, /*[8]*/ 2, /*[9]*/ 0x02, /*[10]*/ 0x55, /*[11]*/ 0x03, /*[12]*/ 0xC8]
+    let battery = PayloadDecoder.battery(batteryFrame)
+    let expectedBattery = BatteryStatus(left: 85, right: 72, caseLevel: nil,
+                                        leftCharging: false, rightCharging: true, caseCharging: false)
+    checks.append(CheckResult("battery: L=85 noCharge, R=72 charging, case=nil",
+                              battery == expectedBattery,
+                              "got \(battery)"))
+
+    // Battery on a too-short frame → empty status, no crash.
+    checks.append(CheckResult("battery: short frame → empty status",
+                              PayloadDecoder.battery([0x55, 0x60]) == BatteryStatus(),
+                              "got \(PayloadDecoder.battery([0x55, 0x60]))"))
+
+    // Latency: frame[8] == 0x01 → true; 0x00 → false.
+    checks.append(CheckResult("latency: [8]=0x01 → true",
+                              PayloadDecoder.latencyEnabled([0, 0, 0, 0, 0, 0, 0, 0, 0x01]) == true))
+    checks.append(CheckResult("latency: [8]=0x00 → false",
+                              PayloadDecoder.latencyEnabled([0, 0, 0, 0, 0, 0, 0, 0, 0x00]) == false))
+
+    // In-ear: frame[10] != 0 → true; == 0 → false; short → false.
+    checks.append(CheckResult("inEar: [10]=0x01 → true",
+                              PayloadDecoder.inEarEnabled([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x01]) == true))
+    checks.append(CheckResult("inEar: [10]=0x00 → false",
+                              PayloadDecoder.inEarEnabled([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00]) == false))
+    checks.append(CheckResult("inEar: short frame → false",
+                              PayloadDecoder.inEarEnabled([0x55, 0x60, 0x01]) == false))
 
     return checks
 }
