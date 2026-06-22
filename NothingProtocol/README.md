@@ -30,9 +30,21 @@ Both runners consume the same single source of test cases,
 - **Typed decoders** (`PayloadDecoder`): battery, latency, in-ear, ANC, EQ,
   firmware, serial, ear-tip result, advanced EQ, enhanced bass, personalized ANC,
   case LED.
+- **Device identification** (`skuFromSerial`, `skuFromFirmware`,
+  `codenameFromDeviceName`, `codenameFromSKU`) and the **capability matrix**
+  (`DeviceCapabilities.capabilities(for:)`), keyed by `Codenames`. This is how the
+  app derives the model family and decides which features to expose.
 
-Decoders mirror the app's `read*` offsets exactly (extraction, not redesign); the
-only added behavior is bounds-safety.
+Decoders and identification mirror the app's logic exactly (extraction, not
+redesign); the only added behavior is bounds-safety.
+
+### Known device gap
+
+`CMF Buds Pro 2` is **not** recognized — it has no entry in the name matcher or the
+SKU table, so it resolves to `Codenames.UNKNOWN` (all capabilities off). Supported
+CMF models are Buds 2 (`GIRAFARIG`), Buds 2 Plus (`GLIGAR`), Buds 2a (`HOOTHOOT`).
+Adding Buds Pro 2 needs its codename + SKU codes + capability profile (to be
+reverse-engineered). A test documents this gap.
 
 ## Deferred to the app-integration step
 
