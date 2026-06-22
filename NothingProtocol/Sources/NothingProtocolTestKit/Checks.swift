@@ -7,6 +7,7 @@ public func runChecks() -> [CheckResult] {
     results.append(contentsOf: crcChecks())
     results.append(contentsOf: commandChecks())
     results.append(contentsOf: encoderChecks())
+    results.append(contentsOf: decoderChecks())
     return results
 }
 
@@ -52,6 +53,44 @@ private func encoderChecks() -> [CheckResult] {
                     setLatency == expectedSetLatency,
                     "got \(hex(setLatency))"),
     ]
+}
+
+// MARK: - Decoder
+
+private func decoderChecks() -> [CheckResult] {
+    var checks: [CheckResult] = []
+
+    // Round-trip: encode a frame with payload, then decode it back.
+    let frame = PacketEncoder.encode(command: .SET_LATENCY, payload: [0x01])
+    if let packet = PacketDecoder.decode(frame) {
+        checks.append(CheckResult("decode round-trip: command == 0x40F0",
+                                  packet.command == 0x40F0,
+                                  "got 0x\(String(packet.command, radix: 16))"))
+        checks.append(CheckResult("decode round-trip: operationID == 0x40",
+                                  packet.operationID == 0x40,
+                                  "got 0x\(String(packet.operationID, radix: 16))"))
+        checks.append(CheckResult("decode round-trip: payload == [0x01]",
+                                  packet.payload == [0x01],
+                                  "got \(hex(packet.payload))"))
+    } else {
+        checks.append(CheckResult("decode round-trip: valid frame decodes", false, "got nil"))
+    }
+
+    // CRC mismatch → reject.
+    var badCRC = frame
+    badCRC[badCRC.count - 1] ^= 0xFF
+    checks.append(CheckResult("decode rejects CRC mismatch", PacketDecoder.decode(badCRC) == nil))
+
+    // Too short → reject.
+    checks.append(CheckResult("decode rejects truncated frame",
+                              PacketDecoder.decode([0x55, 0x60, 0x01]) == nil))
+
+    // Wrong magic byte → reject.
+    var badMagic = frame
+    badMagic[0] = 0x00
+    checks.append(CheckResult("decode rejects wrong magic", PacketDecoder.decode(badMagic) == nil))
+
+    return checks
 }
 
 // MARK: - CRC16
