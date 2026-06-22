@@ -1,7 +1,4 @@
-# This workflow will build a Swift project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-swift
-
-name: Swift
+name: CI
 
 on:
   push:
@@ -10,13 +7,33 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-
+  # Primary, fully self-contained job: the NothingProtocol codec package.
+  # Pure Foundation — builds and tests without Xcode signing/schemes.
+  codec:
+    name: NothingProtocol codec
     runs-on: macos-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: swift build -v
-    - name: Run tests
-      run: swift test -v
+      - uses: actions/checkout@v4
+      - name: Build codec
+        run: swift build --package-path NothingProtocol
+      - name: Verify (executable harness)
+        run: swift run --package-path NothingProtocol nothing-protocol-verify
+      - name: XCTest
+        run: swift test --package-path NothingProtocol
+
+  # Best-effort: build the macOS app. Requires a SHARED Xcode scheme, which is
+  # not committed yet (current schemes live in xcuserdata). Until a scheme is
+  # marked "Shared" in Xcode, this job is informational and allowed to fail.
+  # See docs/superpowers/specs/2026-06-22-nothing-protocol-codec-design.md §8.
+  app-build:
+    name: App build (best-effort)
+    runs-on: macos-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build app
+        run: |
+          xcodebuild -project "Nothing X MacOS.xcodeproj" \
+            -scheme "Nothing X MacOS" \
+            -destination 'platform=macOS' \
+            build CODE_SIGNING_ALLOWED=NO
