@@ -146,4 +146,43 @@ public enum PayloadDecoder {
         }
         return colors
     }
+
+    /// Decode a little-endian IEEE-754 float from 4 EQ bytes. Mirrors the app's
+    /// `decodeFloatFromEQ`.
+    public static func eqFloat(_ bytes: [UInt8]) -> Float {
+        guard bytes.count >= 4 else { return 0.0 }
+        let bitPattern = UInt32(bytes[3]) << 24 | UInt32(bytes[2]) << 16
+            | UInt32(bytes[1]) << 8 | UInt32(bytes[0])
+        return Float(bitPattern: bitPattern)
+    }
+
+    /// Mirrors `readCustomEQ`: 4-byte floats at offsets 14 (treble), 27 (bass),
+    /// 40 (mid). Requires at least 44 bytes.
+    public static func customEQ(_ frame: [UInt8]) -> CustomEQ? {
+        guard frame.count >= 44 else { return nil }
+        let treble = eqFloat(Array(frame[14..<18]))
+        let bass = eqFloat(Array(frame[27..<31]))
+        let mid = eqFloat(Array(frame[40..<44]))
+        return CustomEQ(bass: bass, mid: mid, treble: treble)
+    }
+
+    /// Mirrors `readGestures`: `frame[8]` = count; each entry is 4 bytes —
+    /// device at `9 + i*4`, gesture at `11 + i*4`, action at `12 + i*4`. Entries
+    /// with an unknown device or gesture are skipped.
+    public static func gestures(_ frame: [UInt8]) -> [GestureAssignment] {
+        let countIndex = ProtocolConstants.payloadStartIndex
+        guard frame.count > countIndex else { return [] }
+        let count = Int(frame[countIndex])
+        var result: [GestureAssignment] = []
+        for i in 0..<count {
+            let deviceIndex = countIndex + 1 + (i * 4)  // 9 + i*4
+            let gestureIndex = countIndex + 3 + (i * 4) // 11 + i*4
+            let actionIndex = countIndex + 4 + (i * 4)  // 12 + i*4
+            guard actionIndex < frame.count else { break }
+            guard let device = DeviceType(rawValue: frame[deviceIndex]),
+                  let gesture = GestureType(rawValue: frame[gestureIndex]) else { continue }
+            result.append(GestureAssignment(device: device, gesture: gesture, action: frame[actionIndex]))
+        }
+        return result
+    }
 }

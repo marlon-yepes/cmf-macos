@@ -11,7 +11,50 @@ public func runChecks() -> [CheckResult] {
     results.append(contentsOf: payloadDecoderChecks())
     results.append(contentsOf: extendedDecoderChecks())
     results.append(contentsOf: deviceChecks())
+    results.append(contentsOf: gestureAndCustomEQChecks())
     return results
+}
+
+// MARK: - Gestures & custom EQ (float decoding)
+
+private func gestureAndCustomEQChecks() -> [CheckResult] {
+    var checks: [CheckResult] = []
+
+    // eqFloat: little-endian IEEE-754. 1.0 = 0x3F800000 → LE bytes 00 00 80 3F.
+    checks.append(CheckResult("eqFloat([00,00,80,3F]) == 1.0",
+                              PayloadDecoder.eqFloat([0x00, 0x00, 0x80, 0x3F]) == 1.0,
+                              "got \(PayloadDecoder.eqFloat([0x00, 0x00, 0x80, 0x3F]))"))
+    // -6.0 = 0xC0C00000 → LE bytes 00 00 C0 C0.
+    checks.append(CheckResult("eqFloat([00,00,C0,C0]) == -6.0",
+                              PayloadDecoder.eqFloat([0x00, 0x00, 0xC0, 0xC0]) == -6.0,
+                              "got \(PayloadDecoder.eqFloat([0x00, 0x00, 0xC0, 0xC0]))"))
+
+    // customEQ: treble@14, bass@27, mid@40 (4 bytes each), min 44 bytes.
+    var eq = [UInt8](repeating: 0, count: 44)
+    eq[14] = 0x00; eq[15] = 0x00; eq[16] = 0x80; eq[17] = 0x3F  // treble = 1.0
+    eq[27] = 0x00; eq[28] = 0x00; eq[29] = 0xC0; eq[30] = 0xC0  // bass = -6.0
+    eq[40] = 0x00; eq[41] = 0x00; eq[42] = 0x00; eq[43] = 0x00  // mid = 0.0
+    let customEQExpected = CustomEQ(bass: -6.0, mid: 0.0, treble: 1.0)
+    checks.append(CheckResult("customEQ: bass=-6 mid=0 treble=1",
+                              PayloadDecoder.customEQ(eq) == customEQExpected,
+                              "got \(String(describing: PayloadDecoder.customEQ(eq)))"))
+    checks.append(CheckResult("customEQ: short frame (<44) → nil",
+                              PayloadDecoder.customEQ([0x55, 0x60]) == nil))
+
+    // gestures: count=1 at [8]; device@9, gesture@11, action@12.
+    var g = [UInt8](repeating: 0, count: 13)
+    g[8] = 1; g[9] = 2 /* LEFT */; g[11] = 2 /* DOUBLE_TAP */; g[12] = 5 /* action */
+    let gExpected = [GestureAssignment(device: .LEFT, gesture: .DOUBLE_TAP, action: 5)]
+    checks.append(CheckResult("gestures: 1 entry LEFT/DOUBLE_TAP/action=5",
+                              PayloadDecoder.gestures(g) == gExpected,
+                              "got \(PayloadDecoder.gestures(g))"))
+    // Unknown gesture code is skipped, not crashed.
+    var gBad = [UInt8](repeating: 0, count: 13)
+    gBad[8] = 1; gBad[9] = 2; gBad[11] = 99 /* unknown */; gBad[12] = 5
+    checks.append(CheckResult("gestures: unknown gesture → skipped (empty)",
+                              PayloadDecoder.gestures(gBad).isEmpty))
+
+    return checks
 }
 
 // MARK: - Device identification & capabilities

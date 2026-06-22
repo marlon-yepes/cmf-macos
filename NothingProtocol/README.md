@@ -46,15 +46,12 @@ CMF models are Buds 2 (`GIRAFARIG`), Buds 2 Plus (`GLIGAR`), Buds 2a (`HOOTHOOT`
 Adding Buds Pro 2 needs its codename + SKU codes + capability profile (to be
 reverse-engineered). A test documents this gap.
 
-## Deferred to the app-integration step
+Custom EQ float decoding (`eqFloat` / `customEQ`) and gesture parsing
+(`gestures`, with `DeviceType` / `GestureType`) are included.
 
-These are intentionally **not** ported yet (higher coupling, lower ROI for a
-standalone codec):
+## Remaining: app integration
 
-- **Custom EQ** float decoding (`readCustomEQ` / `decodeFloatFromEQ`) — 4-byte
-  float fields at offsets 14/27/40.
-- **Gesture parsing** (`readGestures`) — depends on the app's `DeviceType` and
-  `GestureType` enums.
-
-They will be added (with the same golden-vector test approach) when the package is
-wired into `NothingServiceImpl`.
+The package is feature-complete for the current protocol. What's left is wiring it
+into the app (needs Xcode): add `NothingProtocol` as a local package dependency to
+the Xcode project, then have `NothingServiceImpl` delegate to it and delete the
+duplicated inline parsing / enums.
