@@ -13,6 +13,7 @@ struct Nothing_X_MacOSApp: App {
     @StateObject private var store = Store()
     @StateObject private var viewModel = MainViewViewModel(bluetoothService: BluetoothServiceImpl(), nothingRepository: NothingRepositoryImpl.shared, nothingService: NothingServiceImpl.shared)
     @StateObject private var budsPickerViewModel = BudsPickerComponentViewModel()
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     private var batteryText: String {
         guard let left = viewModel.leftBattery, let right = viewModel.rightBattery else {
@@ -76,6 +77,14 @@ struct Nothing_X_MacOSApp: App {
 
         }
         .menuBarExtraStyle(.window)
+
+        WindowGroup("Nothing X", id: "main") {
+            MainWindowView()
+                .environmentObject(store)
+                .environmentObject(viewModel)
+                .environmentObject(budsPickerViewModel)
+        }
+        .windowResizability(.contentMinSize)
 
     }
 
