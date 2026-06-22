@@ -69,7 +69,7 @@ class NothingServiceImpl : NothingService {
 
                     // Fallback: detect codename from device name if still unknown
                     if self.nothingDevice?.codename == .UNKNOWN {
-                        let detected = codenameFromDeviceName(name: device.name)
+                        let detected = Nothing_X_MacOS.codenameFromDeviceName(name: device.name)
                         if detected != .UNKNOWN {
                             self.nothingDevice?.codename = detected
                             self.log.info("Codename detected from device name: \(detected)")
@@ -953,10 +953,10 @@ class NothingServiceImpl : NothingService {
             let firmware = readFirmware(hexArray: rawData)
             nothingDevice?.firmware = firmware
             if (nothingDevice?.sku == SKU.UNKNOWN) {
-                let detectedSku = skuFromFirmware(firmware: firmware)
+                let detectedSku = Nothing_X_MacOS.skuFromFirmware(firmware: firmware)
                 if detectedSku != .UNKNOWN {
                     nothingDevice?.sku = detectedSku
-                    nothingDevice?.codename = codenameFromSKU(sku: detectedSku)
+                    nothingDevice?.codename = Nothing_X_MacOS.codenameFromSKU(sku: detectedSku)
                 }
             }
             
@@ -965,13 +965,13 @@ class NothingServiceImpl : NothingService {
             let serial = readSerial(hexPayload: rawData)
             if (!serial.isEmpty) {
                 nothingDevice?.serial = serial
-                let sku = skuFromSerial(serial: serial)
+                let sku = Nothing_X_MacOS.skuFromSerial(serial: serial)
                 if sku != .UNKNOWN {
                     nothingDevice?.sku = sku
-                    nothingDevice?.codename = codenameFromSKU(sku: sku)
+                    nothingDevice?.codename = Nothing_X_MacOS.codenameFromSKU(sku: sku)
                 } else if nothingDevice?.codename == .UNKNOWN, let name = nothingDevice?.name {
                     // Fallback: detect from device name
-                    let detected = codenameFromDeviceName(name: name)
+                    let detected = Nothing_X_MacOS.codenameFromDeviceName(name: name)
                     if detected != .UNKNOWN {
                         nothingDevice?.codename = detected
                         log.info("Codename detected from name fallback: \(detected)")

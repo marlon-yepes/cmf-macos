@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D9A1C0DE0000000000000001 /* NothingProtocol in Frameworks */ = {isa = PBXBuildFile; productRef = D9A1C0DE0000000000000002 /* NothingProtocol */; };
 		65715E482D76E5FE001F3E36 /* exportOptions.plist in Resources */ = {isa = PBXBuildFile; fileRef = 65715E472D76E5FE001F3E36 /* exportOptions.plist */; };
 		65715F472D799E53001F3E36 /* radio_button_not_selected_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 65715F452D799E53001F3E36 /* radio_button_not_selected_dark.png */; };
 		65715F482D799E53001F3E36 /* radio_button_selected_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 65715F462D799E53001F3E36 /* radio_button_selected_dark.png */; };
@@ -82,6 +83,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D9A1C0DE0000000000000001 /* NothingProtocol in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -212,6 +214,9 @@
 			);
 			dependencies = (
 			);
+			packageProductDependencies = (
+				D9A1C0DE0000000000000002 /* NothingProtocol */,
+			);
 			fileSystemSynchronizedGroups = (
 				657C06512D6458BF003B83D2 /* data */,
 				657C065B2D6458BF003B83D2 /* domain */,
@@ -291,6 +296,9 @@
 				Base,
 			);
 			mainGroup = D60C145129697E7B003E10D4;
+			packageReferences = (
+				D9A1C0DE0000000000000003 /* XCLocalSwiftPackageReference "NothingProtocol" */,
+			);
 			productRefGroup = D60C145B29697E7B003E10D4 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -301,6 +309,20 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		D9A1C0DE0000000000000003 /* XCLocalSwiftPackageReference "NothingProtocol" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = NothingProtocol;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D9A1C0DE0000000000000002 /* NothingProtocol */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NothingProtocol;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin PBXResourcesBuildPhase section */
 		D60C145829697E7B003E10D4 /* Resources */ = {
