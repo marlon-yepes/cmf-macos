@@ -1,0 +1,64 @@
+/// Protocol command identifiers, ported verbatim from the app's
+/// `domain/enums/Commands.swift`. Raw values are the 16-bit command codes.
+public enum Command: UInt16 {
+
+    // GET_* — request current state
+    case GET_BATTERY = 0x07C0
+    case GET_SERIAL_NUMBER = 0x06C0
+    case GET_FIRMWARE = 0x42C0
+    case GET_ANC = 0x1EC0
+    case GET_EQ = 0x1FC0
+    case GET_LISTENING_MODE = 0x50C0
+    case GET_IN_EAR_STATUS = 0x0EC0
+    case GET_LATENCY = 0x41C0
+    case GET_GESTURES = 0x18C0
+    case GET_CUSTOM_EQ = 0x24C0
+    case GET_ADVANCED_EQ = 0x2CC0
+    case GET_ENHANCED_BASS = 0x2EC0
+    case GET_PERSONALIZED_ANC = 0x20C0
+    case GET_CASE_LED = 0x17C0
+
+    // SET_* — change state
+    case SET_ANC = 0x0FF0
+    case SET_EQ = 0x10F0
+    case SET_LATENCY = 0x40F0
+    case SET_IN_EAR_STATUS = 0x04F0
+    case SET_RING_BUDS = 0x02F0
+    case SET_GESTURE = 0x03F0
+    case SET_CUSTOM_EQ = 0x41F0
+    case SET_ADVANCED_EQ = 0x4FF0
+    case SET_ENHANCED_BASS = 0x51F0
+    case SET_PERSONALIZED_ANC = 0x11F0
+    case SET_EAR_TIP_TEST = 0x14F0
+    case SET_CASE_LED = 0x0DF0
+
+    // READ_* — inbound response command codes
+    case READ_BATTERY_ONE = 57345
+    case READ_BATTERY_THREE = 57346
+    case READ_BATTERY_TWO = 16391
+    case READ_SERIAL_NUMBER = 16390
+    case READ_ANC_ONE = 57347
+    case READ_ANC_TWO = 16414
+    case READ_FIRMWARE = 16450
+    case READ_GESTURES = 16408
+    case READ_EQ_ONE = 16415
+    case READ_EQ_TWO = 16464
+    case READ_LATENCY = 16449
+    case READ_IN_EAR_MODE = 16398
+    case READ_CUSTOM_EQ = 16452
+    case READ_ADVANCED_EQ = 16460
+    case READ_ENHANCED_BASS = 16462
+    case READ_PERSONALIZED_ANC = 16416
+    case READ_EAR_TIP_RESULT = 57357
+    case READ_CASE_LED = 16407
+
+    case SUCCESS_COMMAND_1 = 28676
+    case UNHANDLED_ONE = 28687
+    case UNHANDLED = 28688
+
+    /// The operation ID byte derived from a command: the high 8 bits of the raw
+    /// value. Matches `Commands.firstEightBits` in the app.
+    public var operationID: UInt8 {
+        UInt8(rawValue >> 8)
+    }
+}
