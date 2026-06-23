@@ -14,6 +14,7 @@ struct Nothing_X_MacOSApp: App {
     @StateObject private var viewModel = MainViewViewModel(bluetoothService: BluetoothServiceImpl(), nothingRepository: NothingRepositoryImpl.shared, nothingService: NothingServiceImpl.shared)
     @StateObject private var budsPickerViewModel = BudsPickerComponentViewModel()
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+    @Environment(\.openWindow) private var openWindow
 
     private var batteryText: String {
         guard let left = viewModel.leftBattery, let right = viewModel.rightBattery else {
@@ -33,22 +34,30 @@ struct Nothing_X_MacOSApp: App {
 
     var body: some Scene {
         MenuBarExtra {
-            NavigationStack(path: $viewModel.navigationPath.animation(.default)) {
-                
-                HomeView()
-                    .navigationDestination(for: Destination.self) { destination in
-                        DestinationView(destination: destination)
-                        
-                        
-                    }
-                    
+            VStack(spacing: 0) {
+                NavigationStack(path: $viewModel.navigationPath.animation(.default)) {
+                    HomeView()
+                        .navigationDestination(for: Destination.self) { destination in
+                            DestinationView(destination: destination)
+                        }
+                }
+                .environmentObject(store)
+                .environmentObject(viewModel)
+                .environmentObject(budsPickerViewModel)
+                .frame(width: 250, height: 230)
+
+                Divider()
+                Button {
+                    openWindow(id: "main")
+                } label: {
+                    Label("Open Main Window", systemImage: "macwindow")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .keyboardShortcut("o")
             }
-            .environmentObject(store)
-            .environmentObject(viewModel)
-            .environmentObject(budsPickerViewModel)
-            .frame(width: 250, height: 230)
-        
-            
         } label: {
             
             Label(batteryText, image: "nothing.ear.1")

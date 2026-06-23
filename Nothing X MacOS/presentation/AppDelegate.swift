@@ -5,4 +5,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         false
     }
+
+    /// Re-activate the app when its Dock icon is clicked with no visible window.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if !flag { NSApp.activate(ignoringOtherApps: true) }
+        return true
+    }
 }
