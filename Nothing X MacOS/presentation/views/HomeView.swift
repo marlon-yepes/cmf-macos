@@ -103,7 +103,7 @@ struct HomeView: View {
         }
     
         .background(.black)
-        .frame(width: 250, height: 230)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .navigationBarBackButtonHidden(true)
     
     }
