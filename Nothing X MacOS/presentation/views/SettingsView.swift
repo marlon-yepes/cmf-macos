@@ -298,7 +298,7 @@ struct SettingsView: View {
             .navigationBarBackButtonHidden(true)
             
             .background(.black)
-            .frame(width: 250, height: 230)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .onAppear {
                 if let device = mainViewModel.nothingDevice {
                     // Sync toggles from device state

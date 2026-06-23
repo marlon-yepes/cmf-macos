@@ -14,6 +14,22 @@ struct MainWindowView: View {
                 Label(item.title, systemImage: item.systemImage).tag(item)
             }
             .navigationSplitViewColumnWidth(min: 180, ideal: 200)
+            .safeAreaInset(edge: .bottom) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Divider()
+                    if let left = viewModel.leftBattery, let right = viewModel.rightBattery {
+                        Label("L \(Int(left))%   R \(Int(right))%", systemImage: "battery.100")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Label("Not connected", systemImage: "antenna.radiowaves.left.and.right.slash")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(8)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
         } detail: {
             NavigationStack(path: $path) {
                 root(for: section ?? .home)

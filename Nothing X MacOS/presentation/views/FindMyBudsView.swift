@@ -82,7 +82,7 @@ struct FindMyBudsView: View {
                 }
                 
             }
-            .frame(width: 250, height: 230)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .zIndex(1)
             
             
@@ -156,7 +156,7 @@ struct FindMyBudsView: View {
         }
         .navigationBarBackButtonHidden(true)
         .background(.black)
-        .frame(width: 250, height: 230)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onDisappear {
             viewModel.stopRinging()
         }

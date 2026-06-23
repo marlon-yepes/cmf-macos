@@ -101,7 +101,7 @@ struct ControlsView: View {
 //        .padding(.horizontal, 4)
         .padding(.top, 0)
         .background(.black)
-        .frame(width: 250, height: 230)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
             
         }
